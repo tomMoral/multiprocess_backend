@@ -18,36 +18,26 @@ version = sys.version_info[:2]
 # and manage the pipes
 parent_r, child_w = os.pipe()
 child_r, parent_w = os.pipe()
-print(sys.version_info[:2])
+
+python_bin = '/usr/bin/python' + str(version[0])
 if version >= (3, 3):
     if sys.platform == 'win32':
-        child_w = os.fdopen(child_w)
-        child_r = os.fdopen(child_r)
+        # Change to Windwos file handle
+        import msvcrt
+        child_w = msvcrt.get_osfhandle(child_w)
+        child_r = msvcrt.get_osfhandle(child_r)
         os.set_handle_inheritable(child_w, True)
         os.set_handle_inheritable(child_r, True)
+        python_bin = 'c:/python{}{}/python'.format(*version)
     else:
         os.set_inheritable(child_w, True)
         os.set_inheritable(child_r, True)
 elif sys.platform == 'win':
-    import _subprocess
     import msvcrt
+    child_w = msvcrt.get_osfhandle(child_w)
+    child_r = msvcrt.get_osfhandle(child_r)
+    python_bin = 'c:/python{}{}/python'.format(*version)
 
-    def duplicate(handle, target_process=None, inheritable=False):
-        if target_process is None:
-            target_process = _subprocess.GetCurrentProcess()
-        return _subprocess.DuplicateHandle(
-            _subprocess.GetCurrentProcess(), handle, target_process,
-            0, inheritable, _subprocess.DUPLICATE_SAME_ACCESS
-        ).Detach()
-    child_w1 = duplicate(msvcrt.get_osfhandle(child_w), inheritable=True)
-    os.close(child_w)
-    child_w = child_w1
-    child_r1 = duplicate(msvcrt.get_osfhandle(child_r), inheritable=True)
-    os.close(child_r)
-    child_r = child_r1
-
-
-python_bin = '/usr/bin/python' + str(version[0])
 proc = Popen([python_bin, 'spawn_client.py', '--pipe',
               str(child_w), str(child_r)],
              close_fds=False)

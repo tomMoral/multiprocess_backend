@@ -8,6 +8,10 @@ assert "--pipe" in sys.argv
 argidx = sys.argv.index("--pipe")
 w = int(args[argidx+1])
 r = int(args[argidx+2])
+if sys.platform == 'win32':
+    import msvcrt
+    w = msvcrt.open_osfhandle(w, os.O_WRONLY)
+    r = msvcrt.open_osfhandle(r, os.O_RDONLY)
 child_write = os.fdopen(w, 'wb')
 child_read = os.fdopen(r, 'rb')
 queue_out = pickle.Pickler(child_write)
