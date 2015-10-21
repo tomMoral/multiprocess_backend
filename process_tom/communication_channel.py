@@ -1,9 +1,9 @@
 import os
 import dill as pickle
+from . import MP_COMM_CHANNEL
 
 
-if ('MP_COMM_CHANNEL' in os.environ.keys() and
-        os.environ['MP_COMM_CHANNEL'] == 'conn'):
+if MP_COMM_CHANNEL == 'conn':
     class CommunicationChannel(object):
         '''Bi directional communication channel
         '''
@@ -20,8 +20,7 @@ if ('MP_COMM_CHANNEL' in os.environ.keys() and
 
         def load(self):
             return pickle.loads(self.conn_in.recv_bytes())
-elif ('MP_COMM_CHANNEL' in os.environ.keys() and
-        os.environ['MP_COMM_CHANNEL'] == 'pipe'):
+elif MP_COMM_CHANNEL == 'pipe':
     class CommunicationChannel(object):
         '''Bi directional communication channel
         '''
