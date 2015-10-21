@@ -35,7 +35,7 @@ if version >= (3, 3):
         os.set_inheritable(child_w, True)
         os.set_inheritable(child_r, True)
         f_desc = [str(child_w), str(child_r)]
-elif sys.platform == 'win':
+elif sys.platform == 'win32':
     import msvcrt
     child_wh = msvcrt.get_osfhandle(child_w)
     child_rh = msvcrt.get_osfhandle(child_r)
