@@ -20,27 +20,30 @@ parent_r, child_w = os.pipe()
 child_r, parent_w = os.pipe()
 
 python_bin = '/usr/bin/python' + str(version[0])
+f_desc = [str(child_w), str(child_r)]
 if version >= (3, 3):
     if sys.platform == 'win32':
         # Change to Windwos file handle
         import msvcrt
-        child_w = msvcrt.get_osfhandle(child_w)
-        child_r = msvcrt.get_osfhandle(child_r)
-        os.set_handle_inheritable(child_w, True)
-        os.set_handle_inheritable(child_r, True)
+        child_wh = msvcrt.get_osfhandle(child_w)
+        child_rh = msvcrt.get_osfhandle(child_r)
+        os.set_handle_inheritable(child_wh, True)
+        os.set_handle_inheritable(child_rh, True)
         python_bin = 'c:/python{}{}/python'.format(*version)
+        f_desc = [str(child_wh), str(child_rh)]
     else:
         os.set_inheritable(child_w, True)
         os.set_inheritable(child_r, True)
+        f_desc = [str(child_w), str(child_r)]
 elif sys.platform == 'win':
     import msvcrt
-    child_w = msvcrt.get_osfhandle(child_w)
-    child_r = msvcrt.get_osfhandle(child_r)
+    child_wh = msvcrt.get_osfhandle(child_w)
+    child_rh = msvcrt.get_osfhandle(child_r)
     python_bin = 'c:/python{}{}/python'.format(*version)
+    f_desc = [str(child_wh), str(child_rh)]
 
-proc = Popen([python_bin, 'spawn_client.py', '--pipe',
-              str(child_w), str(child_r)],
-             close_fds=False)
+proc = Popen([python_bin, 'spawn_client.py', '--pipe'] +
+             f_desc, close_fds=False)
 parent_w = os.fdopen(parent_w, 'wb')
 queue_out = pickle.Pickler(parent_w)
 parent_r = os.fdopen(parent_r, 'rb')
