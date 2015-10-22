@@ -28,14 +28,14 @@ def bench_client(chan):
     sys.exit(0)
 
 
-def bench_parent(proc):
+def bench_parent(proc, size=500):
     print("Parent sleeping or doing stuff")
-    N = 1e9/16 # 500MB
-    test = np.random.randn(N)
+    size = size*1e6/8
+    test = np.random.randn(size)
 
     MB = test.nbytes/1e6
 
-    proc.dump(N)
+    proc.dump(size)
     t_start = time()
     proc.dump(test)
     t_up = time() - t_start
@@ -51,9 +51,14 @@ def bench_parent(proc):
 
 if __name__ == '__main__':
 
+    import argparse
+    parser = argparse.ArgumentParser('Benchmark for the subprocess pipe')
+    parser.add_argument('--size', type=int, default=500,
+                        help='Size of the transfert array in MB')
+    args = parser.parse_args()
     # Create the subprocess
     proc = Process(func=bench_client)
 
-    bench_parent(proc)
+    bench_parent(proc, size=args.size)
     proc.close()
     sys.exit(0)
