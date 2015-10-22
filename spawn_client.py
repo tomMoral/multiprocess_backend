@@ -1,8 +1,9 @@
 
 import os
 import sys
-import dill as pickle
-from communication_channel import CommunicationChannel
+from time import time
+import numpy as np
+from process_tom.communication_channel import CommunicationChannel
 
 args = sys.argv
 if "--pipe" in sys.argv:
@@ -26,15 +27,7 @@ else:
     chan = CommunicationChannel(conn_out, conn_in)
 
 
-f = chan.load()
-args = chan.load()
-res = f(*args)
-print("Child writing", res)
-chan.dump("Text written by child...")
-chan.dump(res)
-#child_write.flush()
-
-# Clean up
-chan.close()
-print("Child closing")
+func = chan.load()
+func(chan)
+print("Should not arrive here")
 sys.exit(0)

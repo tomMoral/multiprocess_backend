@@ -17,7 +17,7 @@ if MP_COMM_CHANNEL == 'pipe':
     class Process(object):
         '''Process using a communicator based on posix pipe
         '''
-        def __init__(self):
+        def __init__(self, func=lambda k: print(42)):
             parent_r, child_w = os.pipe()
             child_r, parent_w = os.pipe()
 
@@ -48,6 +48,7 @@ if MP_COMM_CHANNEL == 'pipe':
             self.chan = CommunicationChannel(parent_w, parent_r)
             os.close(child_w)
             os.close(child_r)
+            self.chan.dump(func)
 
         def dump(self, obj):
             self.chan.dump(obj)
@@ -63,7 +64,7 @@ elif MP_COMM_CHANNEL == 'conn':
         """Procecss with communication based on Listener/Client
         protocol from multiprocessing
         """
-        def __init__(self):
+        def __init__(self, func=lambda k: print(42)):
 
             port = 42027
             address_out = ('localhost', port)
@@ -78,6 +79,7 @@ elif MP_COMM_CHANNEL == 'conn':
             conn_in = Client(address_in, authkey=b'testingToms')
 
             self.chan = CommunicationChannel(conn_out, conn_in)
+            self.chan.dump(func)
 
         def dump(self, obj):
             self.chan.dump(obj)

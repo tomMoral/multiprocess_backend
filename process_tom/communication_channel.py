@@ -3,10 +3,10 @@ import dill as pickle
 from . import MP_COMM_CHANNEL
 
 
-if MP_COMM_CHANNEL == 'conn':
-    class CommunicationChannel(object):
-        '''Bi directional communication channel
-        '''
+class CommunicationChannel(object):
+    '''Bi directional communication channel
+    '''
+    if MP_COMM_CHANNEL == 'conn':
         def __init__(self, conn_out, conn_in):
             self.conn_out = conn_out
             self.conn_in = conn_in
@@ -20,10 +20,7 @@ if MP_COMM_CHANNEL == 'conn':
 
         def load(self):
             return pickle.loads(self.conn_in.recv_bytes())
-elif MP_COMM_CHANNEL == 'pipe':
-    class CommunicationChannel(object):
-        '''Bi directional communication channel
-        '''
+    elif MP_COMM_CHANNEL == 'pipe':
         def __init__(self, fdw, fdr):
             self.fdw = os.fdopen(fdw, 'wb')
             self.fdr = os.fdopen(fdr, 'rb')
@@ -40,5 +37,5 @@ elif MP_COMM_CHANNEL == 'pipe':
 
         def load(self):
             return self.queue_in.load()
-else:
-    raise NotImplementedError('Wrong backend')
+    else:
+        raise NotImplementedError('Wrong backend')
