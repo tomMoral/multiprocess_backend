@@ -1,7 +1,7 @@
 import os
 
+VALID_BACKEND = ['pipe', 'conn', 'sock']
 
-MP_COMM_CHANNEL = 'conn'
-if ('MP_COMM_CHANNEL' in os.environ.keys() and
-        os.environ['MP_COMM_CHANNEL'] == 'pipe'):
-    MP_COMM_CHANNEL = 'pipe'
+MP_COMM_CHANNEL = None
+if 'MP_COMM_CHANNEL' in os.environ.keys():
+    MP_COMM_CHANNEL = os.environ['MP_COMM_CHANNEL']

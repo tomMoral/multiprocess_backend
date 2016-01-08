@@ -1,10 +1,23 @@
 #!/usr/bin/python
 import sys
-import numpy as np
-import os
-from time import time
+from time import sleep
+from process_tom.manager import Manager
 
-from benchmark_functions import bench_parent
+
+def start_manager(backend='pipe', **kwargs):
+
+    # Launch a child process
+    proc = Manager(backend=backend,
+                   **kwargs)
+    for i in range(10):
+        proc.create_subprocess()
+
+    sleep(3)
+    print('STOP')
+    proc.stop()
+
+    print("Parent started subprocess with backend {}".format(backend))
+    proc.close()
 
 if __name__ == '__main__':
 
@@ -26,6 +39,6 @@ if __name__ == '__main__':
         import multiprocessing
         multiprocessing.set_start_method(args.start)
 
-    bench_parent(size=args.size, backend=args.backend,
-                 strat=args.strat)
+    start_manager(backend=args.backend,
+                  strat=args.strat)
     sys.exit(0)
